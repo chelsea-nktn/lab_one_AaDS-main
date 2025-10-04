@@ -1,0 +1,23 @@
+unsigned long int experiment(unsigned long int* dividers, unsigned long int dividers_length, unsigned int max_value, unsigned int max_glad)
+{
+    unsigned int i, j, max_divider, count = 0, operations = 0;
+    bool was_found;
+    for (i = 2; i <= max_value; i++)
+    {
+        j = dividers_length-1;
+        max_divider = 1;
+        was_found = false;
+        while (j >= 0 && !was_found && !(i % dividers[j] == 0 && dividers[j] > max_glad))
+        {
+            operations++;
+            if (i % dividers[j] == 0 && dividers[j] <= max_glad)
+            {
+                count++;
+                was_found = true;
+            }
+            j--;
+        }
+    }
+    return count;
+}
+
