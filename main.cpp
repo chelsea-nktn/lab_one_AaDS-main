@@ -88,9 +88,8 @@ unsigned long int* sieve_eratosphenes(int n, unsigned long int& primes_count)
     return primes;
 }
 
-unsigned long int* experiment(unsigned long int* dividers, unint dividers_length, unint max_value, unint max_glad)
+unsigned long int smooth_numbers_count_experiment(unsigned long int* dividers, unint dividers_length, unint max_value, unint max_glad)
 {
-    unsigned long int* result = new unsigned long int[2];
     unint i, j, max_divider, count = 0, operations = 0;
     bool was_found;
     for (i = 2; i <= max_value; i++)
@@ -109,22 +108,41 @@ unsigned long int* experiment(unsigned long int* dividers, unint dividers_length
             j--;
         }
     }
-    result[0] = count;
-    result[1] = operations;
-    return result;
+    return operations;
 }
-
+unsigned long int smooth_numbers_count(unsigned long int* dividers, unint dividers_length, unint max_value, unint max_glad)
+{
+    unint i, j, max_divider, count = 0, operations = 0;
+    bool was_found;
+    for (i = 2; i <= max_value; i++)
+    {
+        j = dividers_length-1;
+        max_divider = 1;
+        was_found = false;
+        while (j >= 0 && !was_found && !(i % dividers[j] == 0 && dividers[j] > max_glad))
+        {
+            operations++;
+            if (i % dividers[j] == 0 && dividers[j] <= max_glad)
+            {
+                count++;
+                was_found = true;
+            }
+            j--;
+        }
+    }
+    return count;
+}
 
 void test_mode(int n, unsigned long int* dividers, unint length)
 {
-    cout << experiment(dividers, length, MAX_PRIME, n)[0]<< '\n';
+    cout << smooth_numbers_count(dividers, length, MAX_PRIME, n)<< '\n';
 }
 
 int smooth_numbers_experiment(unsigned long int* dividers, unint length)
 {
     unint board, number_of_lines = 1;
     string line;
-    unsigned long int* result = new unsigned long int[2];
+    unint result;
     ifstream fin(FILE_NAME);
     ofstream fout(EXIT_NAME);
     if(fin.is_open())
@@ -132,13 +150,12 @@ int smooth_numbers_experiment(unsigned long int* dividers, unint length)
         while(getline(fin, line))
         {
             board = stoul(line);
-            result = experiment(dividers, length, MAX_PRIME, board);
-            fout << result[0] << " " << result[1] << '\n';
+            result = smooth_numbers_count_experiment(dividers, length, MAX_PRIME, board);
+            fout << result << '\n';
             cout << number_of_lines << " LINES WERE READ" << '\n';
             number_of_lines++;
         }
     }
-    delete[] result;
     fin.close();
     fout.close();
     return 0;
@@ -160,8 +177,8 @@ void experiment_test(unsigned long int* dividers, unsigned long int length, unin
     cout << "Board one: " << board_one << '\n';
     cout << "Board two: " << board_two << '\n';
     cout << '\n' <<"----RESULT----" << '\n';
-    cout << "Result 1: " << experiment(dividers, length, MAX_PRIME, board_one)[0] << '\n';
-    cout << "Result 2: " << experiment(dividers, length, MAX_PRIME, board_two)[0] << '\n';
+    cout << "Result 1: " << smooth_numbers_count(dividers, length, MAX_PRIME, board_one) << '\n';
+    cout << "Result 2: " << smooth_numbers_count(dividers, length, MAX_PRIME, board_two) << '\n';
     cout << "Result 1 >= Result 2" << '\n';
 }
 int main()
@@ -170,8 +187,8 @@ int main()
     unint primes_count;
     unsigned long int* prime_numbers;
     prime_numbers = sieve_eratosphenes(MAX_PRIME, primes_count);
-    //cin >> mode;
-    //test_mode(mode, prime_numbers, primesCount);
+    cin >> mode;
+    test_mode(mode, prime_numbers, primes_count);
     //flag = smooth_numbers_experiment(prime_numbers, primes_count);
     //experiment_test(prime_numbers, primes_count, mode);
     delete[] prime_numbers;
